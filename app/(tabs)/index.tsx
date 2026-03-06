@@ -26,7 +26,7 @@ export default function HomeScreen() {
 
       {/* HEADER BAR */}
       <LinearGradient colors={["#1a1a1a", "#2d2d2d"]} style={styles.header}>
-        <Text style={styles.headerText}>🌿 Diya Soaps</Text>
+        <Text style={styles.headerText}> Diya Soaps</Text>
         <TouchableOpacity onPress={() => router.push("/admin-login")} style={styles.adminBtn}>
           <Ionicons name="shield" size={20} color="#f5c518" />
         </TouchableOpacity>
@@ -115,7 +115,7 @@ export default function HomeScreen() {
 
       {/* FOOTER */}
       <View style={styles.footer}>
-        <Text style={styles.footerBrand}>🌿 Diya Soaps</Text>
+        <Text style={styles.footerBrand}> Diya Soaps</Text>
         <View style={styles.footerLinks}>
           {[
             { label: "Privacy", route: "/privacy" },
