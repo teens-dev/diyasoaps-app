@@ -31,7 +31,7 @@ export default function HomeScreen() {
         source={{ uri: 'https://www.diyasoaps.com/assets/logo-CeP7dR-J.png' }}
       />
         <Text style={styles.headerText}> Diya Soaps</Text>
-        <TouchableOpacity onPress={() => router.push("/admin-login")} style={styles.adminBtn}>
+        <TouchableOpacity style={styles.adminBtn}>
           <Ionicons name="shield" size={20} color="#f5c518" />
         </TouchableOpacity>
       </LinearGradient>
