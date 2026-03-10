@@ -277,3 +277,17 @@ The payment system will:
 **Next Action**: Follow instructions in NEXT_STEPS.md
 
 Good luck! 🚀
+
+
+
+# Install EAS CLI
+npm install -g eas-cli
+
+# Login to Expo account
+eas login
+
+# Configure EAS in your project (first time only)
+eas build:configure
+
+# Build AAB for Play Store
+eas build --platform android --profile production

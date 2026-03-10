@@ -1,7 +1,7 @@
 import React from "react";
 import {
   View, Text, ScrollView, TouchableOpacity,
-  StyleSheet, Dimensions, Linking, Image,
+  StyleSheet, Dimensions, Linking, Image, 
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -26,6 +26,10 @@ export default function HomeScreen() {
 
       {/* HEADER BAR */}
       <LinearGradient colors={["#1a1a1a", "#2d2d2d"]} style={styles.header}>
+        <Image
+        style={styles.imageStylee}
+        source={{ uri: 'https://www.diyasoaps.com/assets/logo-CeP7dR-J.png' }}
+      />
         <Text style={styles.headerText}> Diya Soaps</Text>
         <TouchableOpacity onPress={() => router.push("/admin-login")} style={styles.adminBtn}>
           <Ionicons name="shield" size={20} color="#f5c518" />
@@ -43,7 +47,11 @@ export default function HomeScreen() {
 
       {/* HERO SECTION */}
       <LinearGradient colors={["#fef3c7", "#fde68a", "#fbbf24"]} style={styles.hero}>
-        <Text style={styles.heroEmoji}>🌿</Text>
+        <Image
+        style={styles.imageStyle}
+        source={{ uri: 'https://www.diyasoaps.com/assets/logo-CeP7dR-J.png' }}
+      />
+
         <Text style={styles.heroTitle}>Premium Natural Soaps</Text>
         <Text style={styles.heroSubtitle}>
           Handcrafted with love. Win Gold every 250 members!
@@ -147,6 +155,18 @@ const styles = StyleSheet.create({
   trustBar: { flexDirection: "row", justifyContent: "center", alignItems: "center", backgroundColor: "#fef3c7", paddingVertical: 8, gap: 8 },
   trustText: { fontSize: 11, color: "#92400e", fontWeight: "600" },
   trustDivider: { color: "#d97706" },
+
+   imageStyle: {
+    // Manually specify dimensions for network images
+    width: 100,
+    height: 60,
+  },
+
+  imageStylee: {
+    // Manually specify dimensions for network images
+    width: 40,
+    height: 40,
+  },
 
   // Hero
   hero: { padding: 32, alignItems: "center" },
