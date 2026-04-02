@@ -1,8 +1,8 @@
 // ============================================================
 // PACKAGE DEFINITIONS — Single source of truth
-// regular → 1 box  | 3 soaps  | ₹600
-// half    → 1 box  | 6 soaps  | ₹900   (Half-Yearly Pack)
-// annual  → 2 boxes| 12 soaps | ₹1,188 (Annual Pack)
+// regular → 1 box  | 1 soap   | ₹300
+// half    → 1 box  | 3 soaps  | ₹600   (Value Pack)
+// annual  → 1 box  | 6 soaps  | ₹900   (Bumper Pack)
 // ============================================================
 
 export type PackageMode = "regular" | "half" | "annual";
@@ -20,27 +20,27 @@ export interface PackageConfig {
 
 export const PACKAGE_CONFIG: Record<PackageMode, PackageConfig> = {
   regular: {
-    label: "Regular Box",
+    label: "Starter Pack",
     boxes: 1,
-    soaps: 3,
-    price: 600,
+    soaps: 1,
+    price: 300,
     emoji: "📦",
     highlight: false,
   },
   half: {
-    label: "Half-Yearly Pack",
+    label: "Value Pack",
     boxes: 1,
-    soaps: 6,
-    price: 900,
+    soaps: 3,
+    price: 600,
     emoji: "⭐",
     highlight: false,
   },
   annual: {
-    label: "Annual Pack",
-    boxes: 2,
-    soaps: 12,
-    price: 1188,
-    originalPrice: 2400,
+    label: "Bumper Pack",
+    boxes: 1,
+    soaps: 6,
+    price: 900,
+    originalPrice: 1800,
     tag: "BEST OFFER",
     emoji: "🎉",
     highlight: true,

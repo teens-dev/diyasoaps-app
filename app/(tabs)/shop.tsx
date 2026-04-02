@@ -69,19 +69,19 @@ export default function ShopScreen() {
           <View style={styles.cardHeader}>
             <Text style={styles.cardEmoji}>📦</Text>
             <View>
-              <Text style={styles.cardTitle}>Regular Box</Text>
+              <Text style={styles.cardTitle}>{PACKAGE_CONFIG.regular.label}</Text>
               <Text style={styles.cardSub}>Perfect for trying out</Text>
             </View>
           </View>
           <View style={styles.cardFeatures}>
             <FeatureRow text="1 Box" />
-            <FeatureRow text="3 Premium Handmade Soaps" />
+            <FeatureRow text={`${PACKAGE_CONFIG.regular.soaps} Premium Handmade Soap`} />
             <FeatureRow text="Natural Ingredients" />
             <FeatureRow text="Skin Friendly Formula" />
             <FeatureRow text="Lucky Draw Entry 🎁" />
           </View>
           <View style={styles.cardFooter}>
-            <Text style={styles.price}>₹600</Text>
+            <Text style={styles.price}>₹{PACKAGE_CONFIG.regular.price}</Text>
             <TouchableOpacity style={styles.buyBtn} onPress={() => handleBuy("regular")}>
               <Text style={styles.buyBtnText}>Buy Now</Text>
               <Ionicons name="arrow-forward" size={16} color="#fff" />
@@ -94,18 +94,18 @@ export default function ShopScreen() {
           <View style={styles.cardHeader}>
             <Text style={styles.cardEmoji}>⭐</Text>
             <View>
-              <Text style={styles.cardTitle}>Half-Yearly Pack</Text>
+              <Text style={styles.cardTitle}>{PACKAGE_CONFIG.half.label}</Text>
               <Text style={styles.cardSub}>Great value for 6 months</Text>
             </View>
           </View>
           <View style={styles.cardFeatures}>
             <FeatureRow text="1 Box" />
-            <FeatureRow text="6 Premium Soaps" />
+            <FeatureRow text={`${PACKAGE_CONFIG.half.soaps} Premium Soaps`} />
             <FeatureRow text="Natural Ingredients" />
             <FeatureRow text="Extra Lucky Draw Entry 🎁" />
           </View>
           <View style={styles.cardFooter}>
-            <Text style={styles.price}>₹900</Text>
+            <Text style={styles.price}>₹{PACKAGE_CONFIG.half.price}</Text>
             <TouchableOpacity style={styles.buyBtn} onPress={() => handleBuy("half")}>
               <Text style={styles.buyBtnText}>Buy Now</Text>
               <Ionicons name="arrow-forward" size={16} color="#fff" />
@@ -121,20 +121,20 @@ export default function ShopScreen() {
           <View style={styles.cardHeader}>
             <Text style={styles.cardEmoji}>🎉</Text>
             <View>
-              <Text style={[styles.cardTitle, { color: "#fff" }]}>Annual Pack</Text>
+              <Text style={[styles.cardTitle, { color: "#fff" }]}>{PACKAGE_CONFIG.annual.label}</Text>
               <Text style={[styles.cardSub, { color: "rgba(255,255,255,0.8)" }]}>Maximum savings!</Text>
             </View>
           </View>
           <View style={styles.cardFeatures}>
-            <FeatureRow text="2 Boxes" white />
-            <FeatureRow text="12 Premium Soaps" white />
+            <FeatureRow text="1 Box" white />
+            <FeatureRow text={`${PACKAGE_CONFIG.annual.soaps} Premium Soaps`} white />
             <FeatureRow text="Maximum Savings" white />
             <FeatureRow text="2× Lucky Draw Entries 🎁" white />
           </View>
           <View style={styles.cardFooter}>
             <View>
-              <Text style={styles.strikePrice}>₹2,400</Text>
-              <Text style={[styles.price, { color: "#fff" }]}>₹1,188</Text>
+              <Text style={styles.strikePrice}>₹{PACKAGE_CONFIG.annual.originalPrice?.toLocaleString()}</Text>
+              <Text style={[styles.price, { color: "#fff" }]}>₹{PACKAGE_CONFIG.annual.price}</Text>
             </View>
             <TouchableOpacity style={styles.buyBtnWhite} onPress={() => handleBuy("annual")}>
               <Text style={styles.buyBtnWhiteText}>Buy Now</Text>

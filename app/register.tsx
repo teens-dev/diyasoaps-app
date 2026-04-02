@@ -64,17 +64,15 @@ export default function RegisterScreen() {
 
       if (response && response.ok) {
         console.log("✅ Backend is healthy");
-        setBackendStatus("✅ Backend connected");
       } else if (response) {
         console.warn("⚠️ Backend returned status:", response.status);
-        setBackendStatus(`⚠️ Backend status: ${response.status}`);
       } else {
         console.error("❌ Backend not reachable");
-        setBackendStatus("❌ Backend not reachable");
+
       }
     } catch (err) {
       console.error("❌ Backend health check error:", err);
-      setBackendStatus("❌ Backend connection error");
+
     }
   };
 
@@ -106,8 +104,8 @@ export default function RegisterScreen() {
     try {
       // Step 1: Create Razorpay order (backend doesn't have reserve endpoint)
       console.log("📍 Step 1: Creating Razorpay order...");
-      const packType = mode === "regular" ? "REGULAR" : mode === "half" ? "HALF_YEAR" : "ANNUAL";
-      
+      const packType = mode === "regular" ? "NORMAL" : mode === "half" ? "HALF_YEAR" : "ANNUAL";
+
       const orderRes = await fetch(`${BACKEND_URL}/create-order`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -363,7 +361,7 @@ export default function RegisterScreen() {
 
       if (data.type === "PAYMENT_SUCCESS") {
         setShowWebView(false);
-        
+
         // Validate response data
         if (!data.razorpay_order_id || !data.razorpay_payment_id) {
           Alert.alert("⚠️ Incomplete Response", "Payment data incomplete. Please contact support.");
@@ -374,8 +372,8 @@ export default function RegisterScreen() {
 
         // Step 3: Verify payment with backend
         try {
-          const packType = mode === "regular" ? "REGULAR" : mode === "half" ? "HALF_YEAR" : "ANNUAL";
-          
+          const packType = mode === "regular" ? "NORMAL" : mode === "half" ? "HALF_YEAR" : "ANNUAL";
+
           const verifyRes = await fetch(`${BACKEND_URL}/verify-payment`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -503,7 +501,7 @@ export default function RegisterScreen() {
             }}
             onShouldStartLoadWithRequest={(event) => {
               const { url } = event;
-              
+
               // Allow Razorpay domains
               if (
                 url.includes("razorpay.com") ||
@@ -551,7 +549,7 @@ export default function RegisterScreen() {
     { key: "pincode", label: "Pincode", placeholder: "6-digit pincode", keyboard: "numeric" },
   ];
 
-  return ( 
+  return (
     <View style={styles.container}>
 
       {/* HEADER */}
@@ -643,7 +641,7 @@ const styles = StyleSheet.create({
   header: { paddingTop: 50, paddingBottom: 14, paddingHorizontal: 16, flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   backBtn: { padding: 6, backgroundColor: "rgba(255,255,255,0.1)", borderRadius: 20 },
   headerTitle: { color: "#f5c518", fontSize: 18, fontWeight: "800" },
-  scrollContent: { padding: 16, paddingBottom: 40 },   
+  scrollContent: { padding: 16, paddingBottom: 40 },
 
   summaryCard: { backgroundColor: "#fff", borderRadius: 16, padding: 16, marginBottom: 16, borderWidth: 1.5, borderColor: "#fde68a" },
   summaryTitle: { fontSize: 16, fontWeight: "800", color: "#92400e", marginBottom: 12 },
