@@ -64,15 +64,17 @@ export default function RegisterScreen() {
 
       if (response && response.ok) {
         console.log("✅ Backend is healthy");
+        // setBackendStatus("✅ Backend connected");
       } else if (response) {
         console.warn("⚠️ Backend returned status:", response.status);
+        // setBackendStatus(`⚠️ Backend status: ${response.status}`);
       } else {
         console.error("❌ Backend not reachable");
-
+         // setBackendStatus("❌ Backend not reachable");
       }
     } catch (err) {
       console.error("❌ Backend health check error:", err);
-
+      // setBackendStatus("❌ Backend connection error");
     }
   };
 
