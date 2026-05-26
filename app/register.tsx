@@ -46,34 +46,33 @@ export default function RegisterScreen() {
 
   const checkBackendHealth = async () => {
     try {
-      console.log("🔍 Checking backend health...", BACKEND_URL);
+      console.log("Checking backend health...", BACKEND_URL);
       // create AbortController manually since AbortSignal.timeout isn't available in React Native
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
-
-      const response = await fetch(`${BACKEND_URL}/health`, {
-        method: "GET",
-        signal: controller.signal,
-      }).catch(err => {
-        console.error("Health check failed:", err);
-        return null;
-      });
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
+      let response: Response | null = null;
+      try {
+        response = await fetch(`${BACKEND_URL}/health`, {
+          method: "GET",
+          signal: controller.signal,
+        });
+      } catch {
+        // Keep startup health probe silent to avoid noisy red-screen logs in development.
+        return;
+      }
 
       // clear timeout regardless of outcome
       clearTimeout(timeoutId);
 
       if (response && response.ok) {
-        console.log("✅ Backend is healthy");
+        console.log("Backend is healthy");
         // setBackendStatus("✅ Backend connected");
-      } else if (response) {
-        console.warn("⚠️ Backend returned status:", response.status);
+      } else if (response && response.status >= 500) {
+        console.log("Backend returned status:", response.status);
         // setBackendStatus(`⚠️ Backend status: ${response.status}`);
-      } else {
-        console.error("❌ Backend not reachable");
-         // setBackendStatus("❌ Backend not reachable");
       }
     } catch (err) {
-      console.error("❌ Backend health check error:", err);
+      console.log("Backend health check skipped");
       // setBackendStatus("❌ Backend connection error");
     }
   };
@@ -101,6 +100,10 @@ export default function RegisterScreen() {
 
   const handleSubmit = async () => {
     if (!validate()) return;
+    if (!RAZORPAY_KEY) {
+      Alert.alert("Configuration Error", "Payment is not configured. Please contact support.");
+      return;
+    }
     setLoading(true);
 
     try {
@@ -483,8 +486,13 @@ export default function RegisterScreen() {
             onMessage={handleWebViewMessage}
             javaScriptEnabled={true}
             domStorageEnabled={true}
-            originWhitelist={["https://checkout.razorpay.com", "https://*.razorpay.com", "https://*.razorpay.io", "*"]}
-            mixedContentMode="always"
+            originWhitelist={[
+              "about:blank",
+              "https://checkout.razorpay.com",
+              "https://*.razorpay.com",
+              "https://*.razorpay.io",
+            ]}
+            mixedContentMode="never"
             javaScriptCanOpenWindowsAutomatically={true}
             setSupportMultipleWindows={true}
             useWebKit={true}

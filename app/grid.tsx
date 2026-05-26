@@ -1,5 +1,4 @@
-// VITE_SUPABASE_URL=https://ntazlpdxvdwkyguxbkpf.supabase.co
-// VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im50YXpscGR4dmR3a3lndXhia3BmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkyNTMwMTIsImV4cCI6MjA4NDgyOTAxMn0.zasWIyTlyEA90jVdRnFe2SthU7HwcJ6Hrh5JUPjV7yk
+// VITE_SUPABASE_URL= (set in .env — see .env.example)
 
 
 
@@ -12,13 +11,8 @@ import {
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { createClient } from "@supabase/supabase-js";
 import { PACKAGE_CONFIG, type PackageMode } from "../constants/packages";
-
-// ⚠️ Replace with your actual Supabase credentials
-const SUPABASE_URL = "https://ntazlpdxvdwkyguxbkpf.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im50YXpscGR4dmR3a3lndXhia3BmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkyNTMwMTIsImV4cCI6MjA4NDgyOTAxMn0.zasWIyTlyEA90jVdRnFe2SthU7HwcJ6Hrh5JUPjV7yk";
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+import { supabase } from "../constants/supabase";
 
 const BOXES_REQUIRED: Record<PackageMode, number> = {
   regular: 1,

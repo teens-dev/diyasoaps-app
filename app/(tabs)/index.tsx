@@ -31,9 +31,7 @@ export default function HomeScreen() {
         source={{ uri: 'https://www.diyasoaps.com/assets/logo-CeP7dR-J.png' }}
       />
         <Text style={styles.headerText}> Diya Soaps</Text>
-        <TouchableOpacity style={styles.adminBtn}>
-          <Ionicons name="shield" size={20} color="#f5c518" />
-        </TouchableOpacity>
+        <View style={{ width: 38 }} />
       </LinearGradient>
 
       {/* TRUST BAR */}
@@ -42,7 +40,7 @@ export default function HomeScreen() {
         <Text style={styles.trustDivider}>|</Text>
         <Text style={styles.trustText}>🚚 Free Delivery</Text>
         <Text style={styles.trustDivider}>|</Text>
-        <Text style={styles.trustText}>✨ 100% Natural</Text>
+        <Text style={styles.trustText}>✨ Natural Ingredients</Text>
       </View>
 
       {/* HERO SECTION */}
@@ -62,7 +60,7 @@ export default function HomeScreen() {
             <Text style={styles.heroBadgeText}>🥇 Gold Lucky Draw</Text>
           </View>
           <View style={styles.heroBadge}>
-            <Text style={styles.heroBadgeText}>🌱 100% Natural</Text>
+            <Text style={styles.heroBadgeText}>🌱 Natural Ingredients</Text>
           </View>
         </View>
 
@@ -78,9 +76,9 @@ export default function HomeScreen() {
       <View style={styles.featuresSection}>
         <Text style={styles.sectionTitle}>Why Diya Soaps?</Text>
         {[
-          { icon: "leaf", title: "100% Natural", desc: "No chemicals, no parabens. Pure nature in every bar." },
-          { icon: "trophy", title: "Gold Lucky Draw", desc: "Win 1g Gold Coin every 250 members. Grand draw at 15,000!" },
-          { icon: "shield-checkmark", title: "Trusted Quality", desc: "Dermatologist tested. Safe for all skin types." },
+          { icon: "leaf", title: "Natural Ingredients", desc: "Handmade soaps crafted with plant-based oils and gentle formulas." },
+          { icon: "trophy", title: "Promotional Lucky Draw", desc: "Eligible orders may enter periodic draws for gold prizes. See Terms." },
+          { icon: "shield-checkmark", title: "Trusted Quality", desc: "Small-batch handmade soaps made with care for everyday use." },
           { icon: "car", title: "Free Delivery", desc: "Delivered right to your doorstep across India." },
         ].map((f, i) => (
           <View key={i} style={styles.featureCard}>
@@ -149,8 +147,6 @@ const styles = StyleSheet.create({
   // Header
   header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 20, paddingTop: 50, paddingBottom: 14 },
   headerText: { color: "#f5c518", fontSize: 22, fontWeight: "800" },
-  adminBtn: { padding: 8, backgroundColor: "rgba(255,255,255,0.1)", borderRadius: 20 },
-
   // Trust bar
   trustBar: { flexDirection: "row", justifyContent: "center", alignItems: "center", backgroundColor: "#fef3c7", paddingVertical: 8, gap: 8 },
   trustText: { fontSize: 11, color: "#92400e", fontWeight: "600" },

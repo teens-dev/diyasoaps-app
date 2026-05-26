@@ -68,6 +68,16 @@ export default function LuckyDrawScreen() {
           <Text style={styles.trustTitle}>100% Transparent</Text>
           <Text style={styles.trustText}>All lucky draws are conducted LIVE on video call so every member can witness the fair selection. No manipulation. No bias.</Text>
         </View>
+
+        <View style={styles.disclaimerCard}>
+          <Text style={styles.disclaimerTitle}>Promotional sweepstakes</Text>
+          <Text style={styles.disclaimerText}>
+            Lucky draws are optional sales promotions, not gambling. Eligibility, prizes, and draw rules are set out in our Terms & Conditions. Open to India residents 18+.
+          </Text>
+          <TouchableOpacity onPress={() => router.push("/terms")} style={styles.disclaimerLink}>
+            <Text style={styles.disclaimerLinkText}>Read full contest rules →</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </ScrollView>
   );
@@ -109,4 +119,10 @@ const styles = StyleSheet.create({
   trustCard: { backgroundColor: "#f0fdf4", borderRadius: 16, padding: 20, borderWidth: 1, borderColor: "#bbf7d0", alignItems: "center", marginBottom: 20 },
   trustTitle: { fontSize: 17, fontWeight: "800", color: "#16a34a", marginVertical: 8 },
   trustText: { fontSize: 13, color: "#374151", textAlign: "center", lineHeight: 20 },
+
+  disclaimerCard: { backgroundColor: "#fff", borderRadius: 16, padding: 18, borderWidth: 1, borderColor: "#e5e7eb", marginBottom: 20 },
+  disclaimerTitle: { fontSize: 14, fontWeight: "800", color: "#374151", marginBottom: 6 },
+  disclaimerText: { fontSize: 12, color: "#6b7280", lineHeight: 18, marginBottom: 10 },
+  disclaimerLink: { alignSelf: "flex-start" },
+  disclaimerLinkText: { fontSize: 13, fontWeight: "700", color: "#d97706" },
 });

@@ -47,13 +47,7 @@ export const PACKAGE_CONFIG: Record<PackageMode, PackageConfig> = {
   },
 };
 
-
-const SUPABASE_URL = "https://ntazlpdxvdwkyguxbkpf.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im50YXpscGR4dmR3a3lndXhia3BmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkyNTMwMTIsImV4cCI6MjA4NDgyOTAxMn0.zasWIyTlyEA90jVdRnFe2SthU7HwcJ6Hrh5JUPjV7yk";
-
-// export const BACKEND_URL = "http://192.168.1.28:10000"; 
-export const BACKEND_URL = "https://diya-backenddiya-backend.onrender.com";
-export const RAZORPAY_KEY = "rzp_live_SEoqwulgqrAXys";
+export { BACKEND_URL, RAZORPAY_KEY, PRIVACY_POLICY_URL, SUPPORT_EMAIL } from "./env";
 
 export const PHONE_NUMBER = "+918125134699";
 export const WHATSAPP_NUMBER = "918125134699";
