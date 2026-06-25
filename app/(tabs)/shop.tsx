@@ -1,186 +1,183 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
-  View, Text, ScrollView, TouchableOpacity,
-  StyleSheet, ActivityIndicator, Animated,
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  StyleSheet,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
-import { PACKAGE_CONFIG, BACKEND_URL, TOTAL_MEMBERS, type PackageMode } from "../../constants/packages";
+import {
+  PACK_CONFIG,
+  getPackageDetails,
+  formatPrice,
+  type PackType,
+} from "../../constants/packages";
+
+const PACK_ORDER: PackType[] = ["NORMAL", "HALF_YEAR", "ANNUAL", "RED_SANDAL"];
 
 export default function ShopScreen() {
   const router = useRouter();
-  const [members, setMembers] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const pulseAnim = new Animated.Value(1);
+  const [quantities, setQuantities] = useState<Record<PackType, number>>({
+    NORMAL: 1,
+    HALF_YEAR: 1,
+    ANNUAL: 1,
+    RED_SANDAL: 1,
+  });
 
-  useEffect(() => {
-    fetchMembers();
-    startPulse();
-  }, []);
-
-  const startPulse = () => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(pulseAnim, { toValue: 1.04, duration: 1000, useNativeDriver: true }),
-        Animated.timing(pulseAnim, { toValue: 1, duration: 1000, useNativeDriver: true }),
-      ])
-    ).start();
+  const updateQty = (packType: PackType, delta: number) => {
+    setQuantities((prev) => ({
+      ...prev,
+      [packType]: Math.max(1, Math.min(10, (prev[packType] || 1) + delta)),
+    }));
   };
 
-  const fetchMembers = async () => {
-    try {
-      const res = await fetch(`${BACKEND_URL}/api/slots`);
-      const data = await res.json();
-      const booked = Array.isArray(data)
-        ? data.filter((b: any) => b.status === "booked").length
-        : 0;
-      setMembers(booked);
-    } catch {
-      setMembers(0);
-    } finally {
-      setLoading(false);
-    }
+  const handleBuy = (packType: PackType) => {
+    const qty = quantities[packType] || 1;
+    router.push({ pathname: "/register", params: { packType, qty: String(qty) } });
   };
-
-  const handleBuy = (mode: PackageMode) => {
-    router.push({ pathname: "/grid", params: { mode } });
-  };
-
-  const remainder = members % TOTAL_MEMBERS;
-  const nextDraw = remainder === 0 ? TOTAL_MEMBERS : TOTAL_MEMBERS - remainder;
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-
-      {/* HEADER */}
       <LinearGradient colors={["#1a1a1a", "#2d2d2d"]} style={styles.header}>
-        <Text style={styles.headerTitle}>🛍️ Shop & Rewards</Text>
-        <Text style={styles.headerSub}>Premium Soaps + Gold Lucky Draw</Text>
+        <Text style={styles.headerTitle}>🛍️ Shop</Text>
+        <Text style={styles.headerSub}>Premium Handmade Soaps</Text>
       </LinearGradient>
 
       <View style={styles.content}>
-
-        {/* PACKAGES */}
         <Text style={styles.sectionLabel}>Choose Your Package</Text>
 
-        {/* REGULAR BOX */}
-        <View style={styles.card}>
-          <View style={styles.cardHeader}>
-            <Text style={styles.cardEmoji}>📦</Text>
-            <View>
-              <Text style={styles.cardTitle}>{PACKAGE_CONFIG.regular.label}</Text>
-              <Text style={styles.cardSub}>Perfect for trying out</Text>
-            </View>
-          </View>
-          <View style={styles.cardFeatures}>
-            <FeatureRow text="1 Box" />
-            <FeatureRow text={`${PACKAGE_CONFIG.regular.soaps} Premium Handmade Soap`} />
-            <FeatureRow text="Natural Ingredients" />
-            <FeatureRow text="Skin Friendly Formula" />
-            <FeatureRow text="Lucky Draw Entry 🎁" />
-          </View>
-          <View style={styles.cardFooter}>
-            <Text style={styles.price}>₹{PACKAGE_CONFIG.regular.price}</Text>
-            <TouchableOpacity style={styles.buyBtn} onPress={() => handleBuy("regular")}>
-              <Text style={styles.buyBtnText}>Buy Now</Text>
-              <Ionicons name="arrow-forward" size={16} color="#fff" />
-            </TouchableOpacity>
-          </View>
-        </View>
+        {PACK_ORDER.map((packType) => {
+          const cfg = PACK_CONFIG[packType];
+          const qty = quantities[packType];
+          const details = getPackageDetails(qty, packType);
+          const isHighlight = cfg.highlight;
 
-        {/* HALF-YEARLY PACK */}
-        <View style={styles.card}>
-          <View style={styles.cardHeader}>
-            <Text style={styles.cardEmoji}>⭐</Text>
-            <View>
-              <Text style={styles.cardTitle}>{PACKAGE_CONFIG.half.label}</Text>
-              <Text style={styles.cardSub}>Great value for 6 months</Text>
-            </View>
-          </View>
-          <View style={styles.cardFeatures}>
-            <FeatureRow text="1 Box" />
-            <FeatureRow text={`${PACKAGE_CONFIG.half.soaps} Premium Soaps`} />
-            <FeatureRow text="Natural Ingredients" />
-            <FeatureRow text="Extra Lucky Draw Entry 🎁" />
-          </View>
-          <View style={styles.cardFooter}>
-            <Text style={styles.price}>₹{PACKAGE_CONFIG.half.price}</Text>
-            <TouchableOpacity style={styles.buyBtn} onPress={() => handleBuy("half")}>
-              <Text style={styles.buyBtnText}>Buy Now</Text>
-              <Ionicons name="arrow-forward" size={16} color="#fff" />
-            </TouchableOpacity>
-          </View>
-        </View>
+          const cardContent = (
+            <>
+              {cfg.tag && (
+                <View style={styles.bestOfferBadge}>
+                  <Text style={styles.bestOfferText}>🏆 {cfg.tag}</Text>
+                </View>
+              )}
+              <View style={styles.cardHeader}>
+                <Text style={styles.cardEmoji}>{cfg.emoji}</Text>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.cardTitle, isHighlight && styles.cardTitleWhite]}>
+                    {cfg.label}
+                  </Text>
+                  <Text style={[styles.cardSub, isHighlight && styles.cardSubWhite]}>
+                    {cfg.description}
+                  </Text>
+                </View>
+              </View>
 
-        {/* ANNUAL PACK — highlighted */}
-        <LinearGradient colors={["#f59e0b", "#d97706"]} style={styles.cardHighlight}>
-          <View style={styles.bestOfferBadge}>
-            <Text style={styles.bestOfferText}>🏆 BEST OFFER</Text>
-          </View>
-          <View style={styles.cardHeader}>
-            <Text style={styles.cardEmoji}>🎉</Text>
-            <View>
-              <Text style={[styles.cardTitle, { color: "#fff" }]}>{PACKAGE_CONFIG.annual.label}</Text>
-              <Text style={[styles.cardSub, { color: "rgba(255,255,255,0.8)" }]}>Maximum savings!</Text>
-            </View>
-          </View>
-          <View style={styles.cardFeatures}>
-            <FeatureRow text="1 Box" white />
-            <FeatureRow text={`${PACKAGE_CONFIG.annual.soaps} Premium Soaps`} white />
-            <FeatureRow text="Maximum Savings" white />
-            <FeatureRow text="2× Lucky Draw Entries 🎁" white />
-          </View>
-          <View style={styles.cardFooter}>
-            <View>
-              <Text style={styles.strikePrice}>₹{PACKAGE_CONFIG.annual.originalPrice?.toLocaleString()}</Text>
-              <Text style={[styles.price, { color: "#fff" }]}>₹{PACKAGE_CONFIG.annual.price}</Text>
-            </View>
-            <TouchableOpacity style={styles.buyBtnWhite} onPress={() => handleBuy("annual")}>
-              <Text style={styles.buyBtnWhiteText}>Buy Now</Text>
-              <Ionicons name="arrow-forward" size={16} color="#d97706" />
-            </TouchableOpacity>
-          </View>
-        </LinearGradient>
+              <View style={styles.cardFeatures}>
+                {cfg.isKit ? (
+                  <FeatureRow
+                    text={`${cfg.soapsPerBox} Premium Products per Kit`}
+                    white={isHighlight}
+                  />
+                ) : (
+                  <>
+                    <FeatureRow
+                      text={`${cfg.soapsPerBox} Premium Soap${cfg.soapsPerBox > 1 ? "s" : ""} per box`}
+                      white={isHighlight}
+                    />
+                    <FeatureRow text="Natural Ingredients" white={isHighlight} />
+                    <FeatureRow text="Skin Friendly Formula" white={isHighlight} />
+                  </>
+                )}
+                <FeatureRow text="Free Delivery across India" white={isHighlight} />
+              </View>
 
-        {/* LUCKY DRAW COUNTER */}
-        <Animated.View style={[styles.luckyDrawCard, { transform: [{ scale: pulseAnim }] }]}>
-          <Text style={styles.ldTitle}>🎁 Gold Lucky Draw</Text>
-          <Text style={styles.ldDesc}>
-            Every <Text style={styles.ldBold}>250 members</Text> → 1 Winner gets <Text style={styles.ldBold}>1g Gold Coin!</Text>
+              <View style={styles.qtyRow}>
+                <Text style={[styles.qtyLabel, isHighlight && styles.qtyLabelWhite]}>
+                  Quantity
+                </Text>
+                <View style={styles.qtyControls}>
+                  <TouchableOpacity
+                    style={[styles.qtyBtn, isHighlight && styles.qtyBtnWhite]}
+                    onPress={() => updateQty(packType, -1)}
+                  >
+                    <Ionicons name="remove" size={18} color={isHighlight ? "#d97706" : "#374151"} />
+                  </TouchableOpacity>
+                  <Text style={[styles.qtyVal, isHighlight && styles.qtyValWhite]}>{qty}</Text>
+                  <TouchableOpacity
+                    style={[styles.qtyBtn, isHighlight && styles.qtyBtnWhite]}
+                    onPress={() => updateQty(packType, 1)}
+                  >
+                    <Ionicons name="add" size={18} color={isHighlight ? "#d97706" : "#374151"} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <View style={styles.cardFooter}>
+                <View>
+                  {details.mrp && (
+                    <Text style={[styles.strikePrice, isHighlight && styles.strikePriceWhite]}>
+                      {formatPrice(details.mrp)}
+                    </Text>
+                  )}
+                  <Text style={[styles.price, isHighlight && styles.priceWhite]}>
+                    {formatPrice(details.price)}
+                  </Text>
+                  {details.savings > 0 && (
+                    <Text style={[styles.savings, isHighlight && styles.savingsWhite]}>
+                      Save {formatPrice(details.savings)}
+                    </Text>
+                  )}
+                  {!cfg.isKit && qty > 1 && (
+                    <Text style={[styles.soapNote, isHighlight && styles.soapNoteWhite]}>
+                      {details.soaps} soaps total
+                    </Text>
+                  )}
+                </View>
+                <TouchableOpacity
+                  style={isHighlight ? styles.buyBtnWhite : styles.buyBtn}
+                  onPress={() => handleBuy(packType)}
+                >
+                  <Text style={isHighlight ? styles.buyBtnWhiteText : styles.buyBtnText}>
+                    Buy Now
+                  </Text>
+                  <Ionicons
+                    name="arrow-forward"
+                    size={16}
+                    color={isHighlight ? "#d97706" : "#fff"}
+                  />
+                </TouchableOpacity>
+              </View>
+            </>
+          );
+
+          if (isHighlight) {
+            return (
+              <LinearGradient
+                key={packType}
+                colors={["#f59e0b", "#d97706"]}
+                style={styles.cardHighlight}
+              >
+                {cardContent}
+              </LinearGradient>
+            );
+          }
+
+          return (
+            <View key={packType} style={styles.card}>
+              {cardContent}
+            </View>
+          );
+        })}
+
+        <View style={styles.trustCard}>
+          <Ionicons name="shield-checkmark" size={24} color="#16a34a" />
+          <Text style={styles.trustTitle}>Secure Checkout</Text>
+          <Text style={styles.trustText}>
+            Payments secured by Razorpay. UPI, Cards, Net Banking & Wallets accepted.
           </Text>
-          <View style={styles.ldStats}>
-            <View style={styles.ldStat}>
-              <Text style={styles.ldStatNum}>{loading ? "..." : members}</Text>
-              <Text style={styles.ldStatLabel}>Members Joined</Text>
-            </View>
-            <View style={styles.ldDivider} />
-            <View style={styles.ldStat}>
-              <Text style={styles.ldStatNum}>{loading ? "..." : nextDraw}</Text>
-              <Text style={styles.ldStatLabel}>Until Next Draw</Text>
-            </View>
-          </View>
-          <Text style={styles.ldNote}>🔴 LIVE draw for transparency</Text>
-        </Animated.View>
-
-        {/* GRAND DRAW INFO */}
-        <View style={styles.grandDrawCard}>
-          <Text style={styles.gdTitle}>🏆 Grand Lucky Draw</Text>
-          <Text style={styles.gdDesc}>After all 15,000 orders complete</Text>
-          <View style={styles.gdPrizes}>
-            <View style={styles.gdPrize}>
-              <Text style={styles.gdPrizeEmoji}>🥇</Text>
-              <Text style={styles.gdPrizeLabel}>1st Prize</Text>
-              <Text style={styles.gdPrizeVal}>10g Gold</Text>
-            </View>
-            <View style={styles.gdPrize}>
-              <Text style={styles.gdPrizeEmoji}>🥈</Text>
-              <Text style={styles.gdPrizeLabel}>2nd Prize</Text>
-              <Text style={styles.gdPrizeVal}>5g Gold</Text>
-            </View>
-          </View>
         </View>
-
       </View>
     </ScrollView>
   );
@@ -188,11 +185,9 @@ export default function ShopScreen() {
 
 function FeatureRow({ text, white }: { text: string; white?: boolean }) {
   return (
-    <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 6 }}>
+    <View style={styles.featureRow}>
       <Ionicons name="checkmark-circle" size={16} color={white ? "#fff" : "#16a34a"} />
-      <Text style={{ marginLeft: 8, fontSize: 13, color: white ? "#fff" : "#374151", fontWeight: "500" }}>
-        {text}
-      </Text>
+      <Text style={[styles.featureText, white && styles.featureTextWhite]}>{text}</Text>
     </View>
   );
 }
@@ -205,40 +200,117 @@ const styles = StyleSheet.create({
   content: { padding: 16 },
   sectionLabel: { fontSize: 18, fontWeight: "800", color: "#92400e", marginBottom: 14, marginTop: 4 },
 
-  card: { backgroundColor: "#fff", borderRadius: 18, padding: 18, marginBottom: 14, borderWidth: 1, borderColor: "#fde68a", shadowColor: "#000", shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 },
-  cardHighlight: { borderRadius: 18, padding: 18, marginBottom: 14, shadowColor: "#d97706", shadowOpacity: 0.3, shadowRadius: 12, elevation: 6 },
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 18,
+    padding: 18,
+    marginBottom: 14,
+    borderWidth: 1,
+    borderColor: "#fde68a",
+    shadowColor: "#000",
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  cardHighlight: {
+    borderRadius: 18,
+    padding: 18,
+    marginBottom: 14,
+    shadowColor: "#d97706",
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 6,
+  },
   cardHeader: { flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 14 },
   cardEmoji: { fontSize: 32 },
   cardTitle: { fontSize: 17, fontWeight: "800", color: "#1a1a1a" },
+  cardTitleWhite: { color: "#fff" },
   cardSub: { fontSize: 12, color: "#6b7280", marginTop: 2 },
+  cardSubWhite: { color: "rgba(255,255,255,0.85)" },
   cardFeatures: { marginBottom: 14 },
-  cardFooter: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", borderTopWidth: 1, borderTopColor: "#f3f4f6", paddingTop: 12 },
-  price: { fontSize: 26, fontWeight: "900", color: "#d97706" },
-  strikePrice: { fontSize: 13, color: "rgba(255,255,255,0.6)", textDecorationLine: "line-through" },
-  buyBtn: { flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: "#d97706", paddingHorizontal: 18, paddingVertical: 10, borderRadius: 20 },
+  featureRow: { flexDirection: "row", alignItems: "center", marginBottom: 6 },
+  featureText: { marginLeft: 8, fontSize: 13, color: "#374151", fontWeight: "500" },
+  featureTextWhite: { color: "#fff" },
+
+  qtyRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 14,
+    paddingVertical: 8,
+    borderTopWidth: 1,
+    borderTopColor: "rgba(0,0,0,0.06)",
+  },
+  qtyLabel: { fontSize: 13, fontWeight: "700", color: "#374151" },
+  qtyLabelWhite: { color: "#fff" },
+  qtyControls: { flexDirection: "row", alignItems: "center", gap: 12 },
+  qtyBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "#fef3c7",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  qtyBtnWhite: { backgroundColor: "#fff" },
+  qtyVal: { fontSize: 16, fontWeight: "800", color: "#1a1a1a", minWidth: 24, textAlign: "center" },
+  qtyValWhite: { color: "#fff" },
+
+  cardFooter: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    borderTopWidth: 1,
+    borderTopColor: "rgba(0,0,0,0.06)",
+    paddingTop: 12,
+  },
+  price: { fontSize: 24, fontWeight: "900", color: "#d97706" },
+  priceWhite: { color: "#fff" },
+  strikePrice: { fontSize: 13, color: "#9ca3af", textDecorationLine: "line-through" },
+  strikePriceWhite: { color: "rgba(255,255,255,0.6)" },
+  savings: { fontSize: 12, color: "#16a34a", fontWeight: "700", marginTop: 2 },
+  savingsWhite: { color: "rgba(255,255,255,0.9)" },
+  soapNote: { fontSize: 11, color: "#6b7280", marginTop: 2 },
+  soapNoteWhite: { color: "rgba(255,255,255,0.75)" },
+  buyBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: "#d97706",
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderRadius: 20,
+  },
   buyBtnText: { color: "#fff", fontWeight: "700", fontSize: 14 },
-  buyBtnWhite: { flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: "#fff", paddingHorizontal: 18, paddingVertical: 10, borderRadius: 20 },
+  buyBtnWhite: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: "#fff",
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderRadius: 20,
+  },
   buyBtnWhiteText: { color: "#d97706", fontWeight: "700", fontSize: 14 },
-  bestOfferBadge: { backgroundColor: "#fff", alignSelf: "flex-start", paddingHorizontal: 12, paddingVertical: 4, borderRadius: 20, marginBottom: 10 },
+  bestOfferBadge: {
+    backgroundColor: "#fff",
+    alignSelf: "flex-start",
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 20,
+    marginBottom: 10,
+  },
   bestOfferText: { fontSize: 11, fontWeight: "800", color: "#d97706" },
 
-  luckyDrawCard: { backgroundColor: "#fff", borderRadius: 18, padding: 20, marginBottom: 14, borderWidth: 2, borderColor: "#fbbf24", alignItems: "center" },
-  ldTitle: { fontSize: 20, fontWeight: "900", color: "#92400e", marginBottom: 8 },
-  ldDesc: { fontSize: 14, color: "#374151", textAlign: "center", lineHeight: 20, marginBottom: 16 },
-  ldBold: { fontWeight: "800", color: "#d97706" },
-  ldStats: { flexDirection: "row", width: "100%", marginBottom: 12 },
-  ldStat: { flex: 1, alignItems: "center" },
-  ldDivider: { width: 1, backgroundColor: "#fde68a" },
-  ldStatNum: { fontSize: 28, fontWeight: "900", color: "#d97706" },
-  ldStatLabel: { fontSize: 12, color: "#6b7280", marginTop: 2 },
-  ldNote: { fontSize: 12, color: "#ef4444", fontWeight: "600" },
-
-  grandDrawCard: { backgroundColor: "#1a1a1a", borderRadius: 18, padding: 20, marginBottom: 20, alignItems: "center" },
-  gdTitle: { fontSize: 20, fontWeight: "900", color: "#f5c518", marginBottom: 4 },
-  gdDesc: { fontSize: 13, color: "#9ca3af", marginBottom: 16 },
-  gdPrizes: { flexDirection: "row", gap: 20 },
-  gdPrize: { alignItems: "center", backgroundColor: "rgba(255,255,255,0.07)", padding: 16, borderRadius: 14, minWidth: 100 },
-  gdPrizeEmoji: { fontSize: 28, marginBottom: 4 },
-  gdPrizeLabel: { fontSize: 11, color: "#9ca3af" },
-  gdPrizeVal: { fontSize: 16, fontWeight: "800", color: "#f5c518" },
+  trustCard: {
+    backgroundColor: "#f0fdf4",
+    borderRadius: 16,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: "#bbf7d0",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  trustTitle: { fontSize: 16, fontWeight: "800", color: "#16a34a", marginVertical: 8 },
+  trustText: { fontSize: 13, color: "#374151", textAlign: "center", lineHeight: 20 },
 });

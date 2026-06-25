@@ -6,23 +6,22 @@ const SECTIONS = [
   {
     title: "Overview",
     body:
-      "Diya Soaps (“we”, “us”) operates this mobile app to sell handmade soap products and run optional promotional lucky draws. This policy explains what data we collect, how we use it, and your choices.",
+      "Diya Soaps (“we”, “us”) operates this mobile app to sell handmade soap products. This policy explains what data we collect, how we use it, and your choices.",
   },
   {
     title: "Information we collect",
     body:
       "• Account & order details: name, email, mobile number, delivery address (house, street, city, pincode).\n" +
-      "• Order metadata: package type, box numbers, order ID, payment status.\n" +
+      "• Order metadata: package type, quantity, order ID, payment status.\n" +
       "• Contact form: name, email, phone (optional), and message.\n" +
-      "• Technical data: basic app usage and API requests needed to load the shop grid and process orders.",
+      "• Technical data: basic app usage and API requests needed to process orders.",
   },
   {
     title: "How we use your data",
     body:
       "We use your information to:\n" +
       "• Process and deliver product orders\n" +
-      "• Verify payments and confirm bookings\n" +
-      "• Run promotional lucky draws you opt into by purchasing eligible packages\n" +
+      "• Verify payments and confirm orders\n" +
       "• Respond to support and contact requests\n" +
       "We do not sell your personal data to third parties.",
   },
@@ -30,7 +29,6 @@ const SECTIONS = [
     title: "Third-party services",
     body:
       "• Razorpay — payment processing (card, UPI, net banking, wallets). Razorpay handles payment credentials; we receive payment status and order references only.\n" +
-      "• Supabase — stores box grid availability for the shop.\n" +
       "• Our backend (hosted on Render) — order creation, payment verification, and member records.\n" +
       "Each provider has its own privacy policy. We share only the data needed to complete your transaction.",
   },
@@ -73,7 +71,7 @@ export default function Privacy() {
   return (
     <ScrollView style={styles.c} contentContainerStyle={styles.content}>
       <Text style={styles.t}>Privacy Policy</Text>
-      <Text style={styles.updated}>Last updated: May 2025</Text>
+      <Text style={styles.updated}>Last updated: June 2026</Text>
 
       <TouchableOpacity onPress={openWebPolicy} style={styles.linkBtn}>
         <Text style={styles.linkText}>View full policy on diyasoaps.com →</Text>
@@ -94,7 +92,15 @@ const styles = StyleSheet.create({
   content: { padding: 20, paddingBottom: 40 },
   t: { fontSize: 22, fontWeight: "800", color: "#92400e", marginTop: 8, marginBottom: 4 },
   updated: { fontSize: 12, color: "#9ca3af", marginBottom: 12 },
-  linkBtn: { marginBottom: 16, paddingVertical: 10, paddingHorizontal: 12, backgroundColor: "#fffbeb", borderRadius: 10, borderWidth: 1, borderColor: "#fde68a" },
+  linkBtn: {
+    marginBottom: 16,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    backgroundColor: "#fffbeb",
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#fde68a",
+  },
   linkText: { fontSize: 13, fontWeight: "700", color: "#d97706" },
   h: { fontSize: 16, fontWeight: "800", color: "#92400e", marginTop: 16, marginBottom: 6 },
   b: { fontSize: 14, color: "#374151", lineHeight: 22 },

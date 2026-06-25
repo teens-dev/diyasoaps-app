@@ -7,10 +7,6 @@ export const BACKEND_URL =
 
 export const RAZORPAY_KEY = process.env.EXPO_PUBLIC_RAZORPAY_KEY ?? "";
 
-export const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL ?? "";
-
-export const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? "";
-
 export const PRIVACY_POLICY_URL =
   process.env.EXPO_PUBLIC_PRIVACY_POLICY_URL ?? "https://www.diyasoaps.com/privacy-policy";
 

@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Diya Soaps",
-    "slug": "myApp",
+    "slug": "diya-soaps",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",

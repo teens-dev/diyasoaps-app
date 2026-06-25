@@ -8,7 +8,6 @@ export default function RootLayout() {
       <StatusBar style="dark" />
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="grid" options={{ presentation: "card" }} />
         <Stack.Screen name="register" options={{ presentation: "modal" }} />
         <Stack.Screen name="privacy" options={{ headerShown: true, title: "Privacy Policy" }} />
         <Stack.Screen name="terms" options={{ headerShown: true, title: "Terms & Conditions" }} />
