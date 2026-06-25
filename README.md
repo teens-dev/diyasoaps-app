@@ -338,8 +338,8 @@ npx expo start --clear
 
 
 
-EXPO_PUBLIC_BACKEND_URL=https://your-backend.onrender.com
-EXPO_PUBLIC_RAZORPAY_KEY=rzp_live_your_key_here
-EXPO_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+EXPO_PUBLIC_BACKEND_URL=https://diya-backenddiya-backend.onrender.com
+EXPO_PUBLIC_RAZORPAY_KEY=rzp_live_SEoqwulgqrAXys
+EXPO_PUBLIC_SUPABASE_URL=https://ntazlpdxvdwkyguxbkpf.supabase.co
+EXPO_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im50YXpscGR4dmR3a3lndXhia3BmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkyNTMwMTIsImV4cCI6MjA4NDgyOTAxMn0.zasWIyTlyEA90jVdRnFe2SthU7HwcJ6Hrh5JUPjV7yk
 EXPO_PUBLIC_PRIVACY_POLICY_URL=https://www.diyasoaps.com/privacy-policy
