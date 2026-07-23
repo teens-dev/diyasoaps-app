@@ -421,7 +421,10 @@ export default function RegisterScreen() {
   return (
     <View style={styles.container}>
       <LinearGradient colors={["#1a1a1a", "#2d2d2d"]} style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+        <TouchableOpacity
+          onPress={() => (router.canGoBack() ? router.back() : router.push("/(tabs)"))}
+          style={styles.backBtn}
+        >
           <Ionicons name="arrow-back" size={22} color="#f5c518" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Complete Order</Text>
@@ -493,7 +496,7 @@ function Row({ label, value }: { label: string; value: string }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fffbeb" },
+  container: { flex: 1, backgroundColor: "#FAF4EE" },
   header: {
     paddingTop: 50,
     paddingBottom: 14,
@@ -501,39 +504,40 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    backgroundColor: "#1F1B18",
   },
-  backBtn: { padding: 6, backgroundColor: "rgba(255,255,255,0.1)", borderRadius: 20 },
-  headerTitle: { color: "#f5c518", fontSize: 18, fontWeight: "800" },
+  backBtn: { padding: 6, backgroundColor: "rgba(255,255,255,0.15)", borderRadius: 20 },
+  headerTitle: { color: "#FAF4EE", fontSize: 18, fontWeight: "700" },
   scrollContent: { padding: 16, paddingBottom: 40 },
 
   summaryCard: {
-    backgroundColor: "#fff",
-    borderRadius: 16,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
     padding: 16,
     marginBottom: 16,
-    borderWidth: 1.5,
-    borderColor: "#fde68a",
+    borderWidth: 1,
+    borderColor: "#EAE2D8",
   },
-  summaryTitle: { fontSize: 16, fontWeight: "800", color: "#92400e", marginBottom: 12 },
+  summaryTitle: { fontSize: 16, fontWeight: "700", color: "#1F1B18", marginBottom: 12 },
   summaryRow: { flexDirection: "row", justifyContent: "space-between", marginBottom: 8 },
-  summaryLabel: { fontSize: 13, color: "#6b7280" },
-  summaryVal: { fontSize: 13, fontWeight: "600", color: "#374151" },
-  totalRow: { borderTopWidth: 1, borderTopColor: "#fde68a", paddingTop: 8, marginTop: 4 },
-  totalLabel: { fontSize: 15, fontWeight: "800", color: "#1a1a1a" },
-  totalVal: { fontSize: 20, fontWeight: "900", color: "#d97706" },
+  summaryLabel: { fontSize: 13, color: "#8C7D73" },
+  summaryVal: { fontSize: 13, fontWeight: "600", color: "#1F1B18" },
+  totalRow: { borderTopWidth: 1, borderTopColor: "#EAE2D8", paddingTop: 8, marginTop: 4 },
+  totalLabel: { fontSize: 15, fontWeight: "800", color: "#1F1B18" },
+  totalVal: { fontSize: 20, fontWeight: "900", color: "#1F1B18" },
 
-  formTitle: { fontSize: 16, fontWeight: "800", color: "#92400e", marginBottom: 12 },
+  formTitle: { fontSize: 16, fontWeight: "700", color: "#1F1B18", marginBottom: 12 },
   inputGroup: { marginBottom: 12 },
-  inputLabel: { fontSize: 12, fontWeight: "700", color: "#374151", marginBottom: 4 },
+  inputLabel: { fontSize: 12, fontWeight: "600", color: "#4A4543", marginBottom: 4 },
   input: {
-    backgroundColor: "#fff",
-    borderWidth: 1.5,
-    borderColor: "#fde68a",
-    borderRadius: 12,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#EAE2D8",
+    borderRadius: 8,
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 14,
-    color: "#1a1a1a",
+    color: "#1F1B18",
   },
 
   payBtn: {
@@ -541,18 +545,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 10,
-    backgroundColor: "#d97706",
+    backgroundColor: "#231F20",
     paddingVertical: 16,
-    borderRadius: 16,
+    borderRadius: 25,
     marginTop: 8,
-    shadowColor: "#d97706",
-    shadowOpacity: 0.4,
-    shadowRadius: 10,
-    elevation: 6,
+    elevation: 3,
   },
   payBtnDisabled: { opacity: 0.6 },
-  payBtnText: { color: "#fff", fontWeight: "800", fontSize: 16 },
-  secureNote: { textAlign: "center", fontSize: 12, color: "#9ca3af", marginTop: 10, marginBottom: 20 },
+  payBtnText: { color: "#FFFFFF", fontWeight: "700", fontSize: 16 },
+  secureNote: { textAlign: "center", fontSize: 12, color: "#8C7D73", marginTop: 10, marginBottom: 20 },
 
   webviewHeader: {
     flexDirection: "row",
@@ -561,33 +562,33 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 50,
     paddingBottom: 12,
-    backgroundColor: "#1a1a1a",
+    backgroundColor: "#1F1B18",
   },
-  webviewClose: { padding: 6, backgroundColor: "rgba(255,255,255,0.1)", borderRadius: 20 },
-  webviewTitle: { color: "#f5c518", fontSize: 15, fontWeight: "700" },
+  webviewClose: { padding: 6, backgroundColor: "rgba(255,255,255,0.15)", borderRadius: 20 },
+  webviewTitle: { color: "#FAF4EE", fontSize: 15, fontWeight: "700" },
 
-  successContainer: { flex: 1, justifyContent: "center", alignItems: "center", padding: 24 },
+  successContainer: { flex: 1, justifyContent: "center", alignItems: "center", padding: 24, backgroundColor: "#FAF4EE" },
   successTitle: {
     fontSize: 26,
     fontWeight: "900",
-    color: "#16a34a",
+    color: "#2D7D46",
     marginTop: 16,
     marginBottom: 8,
   },
-  successSub: { fontSize: 14, color: "#6b7280", marginBottom: 24 },
+  successSub: { fontSize: 14, color: "#8C7D73", marginBottom: 24 },
   successCard: {
-    backgroundColor: "#fff",
-    borderRadius: 16,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
     padding: 20,
     width: "100%",
     borderWidth: 1,
-    borderColor: "#d1fae5",
+    borderColor: "#EAE2D8",
     marginBottom: 16,
   },
-  divider: { height: 1, backgroundColor: "#e5e7eb", marginVertical: 10 },
-  addressLabel: { fontSize: 13, fontWeight: "700", color: "#374151", marginBottom: 6 },
-  addressText: { fontSize: 13, color: "#6b7280" },
-  emailNote: { fontSize: 12, color: "#6b7280", marginBottom: 24, textAlign: "center" },
-  homeBtn: { backgroundColor: "#d97706", paddingHorizontal: 32, paddingVertical: 14, borderRadius: 25 },
-  homeBtnText: { color: "#fff", fontWeight: "800", fontSize: 15 },
+  divider: { height: 1, backgroundColor: "#EAE2D8", marginVertical: 10 },
+  addressLabel: { fontSize: 13, fontWeight: "700", color: "#1F1B18", marginBottom: 6 },
+  addressText: { fontSize: 13, color: "#4A4543" },
+  emailNote: { fontSize: 12, color: "#8C7D73", marginBottom: 24, textAlign: "center" },
+  homeBtn: { backgroundColor: "#231F20", paddingHorizontal: 32, paddingVertical: 14, borderRadius: 25 },
+  homeBtnText: { color: "#FFFFFF", fontWeight: "700", fontSize: 15 },
 });

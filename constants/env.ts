@@ -11,3 +11,7 @@ export const PRIVACY_POLICY_URL =
   process.env.EXPO_PUBLIC_PRIVACY_POLICY_URL ?? "https://www.diyasoaps.com/privacy-policy";
 
 export const SUPPORT_EMAIL = "support@diyasoaps.com";
+
+
+console.log("BACKEND_URL =", process.env.EXPO_PUBLIC_BACKEND_URL);
+console.log("RAZORPAY_KEY =", process.env.EXPO_PUBLIC_RAZORPAY_KEY);

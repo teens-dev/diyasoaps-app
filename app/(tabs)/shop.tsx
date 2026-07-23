@@ -1,13 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   ScrollView,
   TouchableOpacity,
   StyleSheet,
+  Image,
+  Dimensions,
+  Share,
 } from "react-native";
-import { useRouter } from "expo-router";
-import { LinearGradient } from "expo-linear-gradient";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import {
   PACK_CONFIG,
@@ -16,10 +18,41 @@ import {
   type PackType,
 } from "../../constants/packages";
 
+const { width } = Dimensions.get("window");
+
 const PACK_ORDER: PackType[] = ["NORMAL", "HALF_YEAR", "ANNUAL", "RED_SANDAL"];
+
+const DIYA_LOGO    = "https://www.diyasoaps.com/assets/logo-CeP7dR-J.png";
+const IMG_SINGLE   = "https://www.diyasoaps.com/assets/soap-single-CZkjmFEz.png";
+const IMG_GANESHA  = "https://www.diyasoaps.com/assets/soap-ganesha-BwnX0vi1.png";
+const IMG_HAND     = "https://www.diyasoaps.com/assets/soap-hand-D6IhdUvB.png";
+const IMG_WITH_BOX = "https://www.diyasoaps.com/assets/soap-with-box-Lq7DmNyD.png";
+const IMG_MAIN     = "https://www.diyasoaps.com/assets/diya-soap-CRomTGM1.png";
+
+// Gallery images per pack type — real Diya Soaps product photos
+const PACK_IMAGES: Record<PackType, string[]> = {
+  NORMAL:    [IMG_SINGLE, IMG_HAND, IMG_MAIN],
+  HALF_YEAR: [IMG_GANESHA, IMG_SINGLE, IMG_HAND],
+  ANNUAL:    [IMG_HAND, IMG_GANESHA, IMG_MAIN],
+  RED_SANDAL: [IMG_WITH_BOX, IMG_HAND, IMG_GANESHA],
+};
 
 export default function ShopScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams<{ packType?: string }>();
+  
+  const [selectedPack, setSelectedPack] = useState<PackType>(
+    (params.packType as PackType) && PACK_ORDER.includes(params.packType as PackType)
+      ? (params.packType as PackType)
+      : "ANNUAL"
+  );
+
+  useEffect(() => {
+    if (params.packType && PACK_ORDER.includes(params.packType as PackType)) {
+      setSelectedPack(params.packType as PackType);
+    }
+  }, [params.packType]);
+
   const [quantities, setQuantities] = useState<Record<PackType, number>>({
     NORMAL: 1,
     HALF_YEAR: 1,
@@ -27,290 +60,472 @@ export default function ShopScreen() {
     RED_SANDAL: 1,
   });
 
-  const updateQty = (packType: PackType, delta: number) => {
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+
+  const images = PACK_IMAGES[selectedPack] ?? [IMG_MAIN];
+
+  // Reset gallery index when pack changes
+  useEffect(() => {
+    setSelectedImageIndex(0);
+  }, [selectedPack]);
+
+  const currentConfig = PACK_CONFIG[selectedPack];
+  const currentQty = quantities[selectedPack] || 1;
+  const details = getPackageDetails(currentQty, selectedPack);
+
+  const updateQty = (delta: number) => {
     setQuantities((prev) => ({
       ...prev,
-      [packType]: Math.max(1, Math.min(10, (prev[packType] || 1) + delta)),
+      [selectedPack]: Math.max(1, Math.min(10, (prev[selectedPack] || 1) + delta)),
     }));
   };
 
-  const handleBuy = (packType: PackType) => {
-    const qty = quantities[packType] || 1;
-    router.push({ pathname: "/register", params: { packType, qty: String(qty) } });
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.push("/(tabs)");
+    }
+  };
+
+  const handleShare = async () => {
+    try {
+      await Share.share({
+        message: `Check out ${currentConfig.label} on Diya Soaps! Handcrafted natural soaps made with plant-based oils: https://www.diyasoaps.com`,
+      });
+    } catch {
+      // ignore
+    }
+  };
+
+  const handleBuy = () => {
+    router.push({
+      pathname: "/register",
+      params: { packType: selectedPack, qty: String(currentQty) },
+    });
   };
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <LinearGradient colors={["#1a1a1a", "#2d2d2d"]} style={styles.header}>
-        <Text style={styles.headerTitle}>🛍️ Shop</Text>
-        <Text style={styles.headerSub}>Premium Handmade Soaps</Text>
-      </LinearGradient>
-
-      <View style={styles.content}>
-        <Text style={styles.sectionLabel}>Choose Your Package</Text>
-
-        {PACK_ORDER.map((packType) => {
-          const cfg = PACK_CONFIG[packType];
-          const qty = quantities[packType];
-          const details = getPackageDetails(qty, packType);
-          const isHighlight = cfg.highlight;
-
-          const cardContent = (
-            <>
-              {cfg.tag && (
-                <View style={styles.bestOfferBadge}>
-                  <Text style={styles.bestOfferText}>🏆 {cfg.tag}</Text>
-                </View>
-              )}
-              <View style={styles.cardHeader}>
-                <Text style={styles.cardEmoji}>{cfg.emoji}</Text>
-                <View style={{ flex: 1 }}>
-                  <Text style={[styles.cardTitle, isHighlight && styles.cardTitleWhite]}>
-                    {cfg.label}
-                  </Text>
-                  <Text style={[styles.cardSub, isHighlight && styles.cardSubWhite]}>
-                    {cfg.description}
-                  </Text>
-                </View>
-              </View>
-
-              <View style={styles.cardFeatures}>
-                {cfg.isKit ? (
-                  <FeatureRow
-                    text={`${cfg.soapsPerBox} Premium Products per Kit`}
-                    white={isHighlight}
-                  />
-                ) : (
-                  <>
-                    <FeatureRow
-                      text={`${cfg.soapsPerBox} Premium Soap${cfg.soapsPerBox > 1 ? "s" : ""} per box`}
-                      white={isHighlight}
-                    />
-                    <FeatureRow text="Natural Ingredients" white={isHighlight} />
-                    <FeatureRow text="Skin Friendly Formula" white={isHighlight} />
-                  </>
-                )}
-                <FeatureRow text="Free Delivery across India" white={isHighlight} />
-              </View>
-
-              <View style={styles.qtyRow}>
-                <Text style={[styles.qtyLabel, isHighlight && styles.qtyLabelWhite]}>
-                  Quantity
-                </Text>
-                <View style={styles.qtyControls}>
-                  <TouchableOpacity
-                    style={[styles.qtyBtn, isHighlight && styles.qtyBtnWhite]}
-                    onPress={() => updateQty(packType, -1)}
-                  >
-                    <Ionicons name="remove" size={18} color={isHighlight ? "#d97706" : "#374151"} />
-                  </TouchableOpacity>
-                  <Text style={[styles.qtyVal, isHighlight && styles.qtyValWhite]}>{qty}</Text>
-                  <TouchableOpacity
-                    style={[styles.qtyBtn, isHighlight && styles.qtyBtnWhite]}
-                    onPress={() => updateQty(packType, 1)}
-                  >
-                    <Ionicons name="add" size={18} color={isHighlight ? "#d97706" : "#374151"} />
-                  </TouchableOpacity>
-                </View>
-              </View>
-
-              <View style={styles.cardFooter}>
-                <View>
-                  {details.mrp && (
-                    <Text style={[styles.strikePrice, isHighlight && styles.strikePriceWhite]}>
-                      {formatPrice(details.mrp)}
-                    </Text>
-                  )}
-                  <Text style={[styles.price, isHighlight && styles.priceWhite]}>
-                    {formatPrice(details.price)}
-                  </Text>
-                  {details.savings > 0 && (
-                    <Text style={[styles.savings, isHighlight && styles.savingsWhite]}>
-                      Save {formatPrice(details.savings)}
-                    </Text>
-                  )}
-                  {!cfg.isKit && qty > 1 && (
-                    <Text style={[styles.soapNote, isHighlight && styles.soapNoteWhite]}>
-                      {details.soaps} soaps total
-                    </Text>
-                  )}
-                </View>
-                <TouchableOpacity
-                  style={isHighlight ? styles.buyBtnWhite : styles.buyBtn}
-                  onPress={() => handleBuy(packType)}
-                >
-                  <Text style={isHighlight ? styles.buyBtnWhiteText : styles.buyBtnText}>
-                    Buy Now
-                  </Text>
-                  <Ionicons
-                    name="arrow-forward"
-                    size={16}
-                    color={isHighlight ? "#d97706" : "#fff"}
-                  />
-                </TouchableOpacity>
-              </View>
-            </>
-          );
-
-          if (isHighlight) {
-            return (
-              <LinearGradient
-                key={packType}
-                colors={["#f59e0b", "#d97706"]}
-                style={styles.cardHighlight}
-              >
-                {cardContent}
-              </LinearGradient>
-            );
-          }
-
-          return (
-            <View key={packType} style={styles.card}>
-              {cardContent}
-            </View>
-          );
-        })}
-
-        <View style={styles.trustCard}>
-          <Ionicons name="shield-checkmark" size={24} color="#16a34a" />
-          <Text style={styles.trustTitle}>Secure Checkout</Text>
-          <Text style={styles.trustText}>
-            Payments secured by Razorpay. UPI, Cards, Net Banking & Wallets accepted.
-          </Text>
+    <View style={styles.screenWrapper}>
+      {/* Top Header Bar with Back Navigation */}
+      <View style={styles.headerBar}>
+        <TouchableOpacity style={styles.backBtn} onPress={handleBack} activeOpacity={0.7}>
+          <Ionicons name="chevron-back" size={24} color="#1F1B18" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle} numberOfLines={1}>
+          {currentConfig.label} — Diya Soaps
+        </Text>
+        <View style={styles.headerActions}>
+          <TouchableOpacity style={styles.iconBtn} onPress={() => router.push("/(tabs)/contact")}>
+            <Ionicons name="call-outline" size={22} color="#1F1B18" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.iconBtn} onPress={handleBuy}>
+            <Ionicons name="bag-outline" size={22} color="#1F1B18" />
+          </TouchableOpacity>
         </View>
       </View>
-    </ScrollView>
-  );
-}
 
-function FeatureRow({ text, white }: { text: string; white?: boolean }) {
-  return (
-    <View style={styles.featureRow}>
-      <Ionicons name="checkmark-circle" size={16} color={white ? "#fff" : "#16a34a"} />
-      <Text style={[styles.featureText, white && styles.featureTextWhite]}>{text}</Text>
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+        {/* Product Image Gallery */}
+        <View style={styles.imageGalleryBox}>
+          <Image
+            source={{ uri: images[selectedImageIndex] ?? images[0] }}
+            style={styles.mainProductImage}
+            resizeMode="cover"
+          />
+
+          {/* Dot / Thumbnail Navigation */}
+          <View style={styles.dotsRow}>
+            {images.map((_, idx) => (
+              <TouchableOpacity key={idx} onPress={() => setSelectedImageIndex(idx)}>
+                <View style={[styles.dot, selectedImageIndex === idx && styles.dotActive]} />
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        {/* Product Details Section */}
+        <View style={styles.productDetailsBox}>
+          <View style={styles.titleShareRow}>
+            <View style={{ flex: 1 }}>
+              {currentConfig.tag && (
+                <View style={styles.offerTagBadge}>
+                  <Text style={styles.offerTagText}>🏆 {currentConfig.tag}</Text>
+                </View>
+              )}
+              <Text style={styles.productTitleText}>{currentConfig.label}</Text>
+              <Text style={styles.productDescText}>{currentConfig.description}</Text>
+            </View>
+
+            <TouchableOpacity style={styles.shareBtn} onPress={handleShare}>
+              <Ionicons name="share-outline" size={22} color="#1F1B18" />
+            </TouchableOpacity>
+          </View>
+
+          {/* Pricing Row */}
+          <View style={styles.priceRow}>
+            {details.mrp && (
+              <Text style={styles.mrpText}>{formatPrice(details.mrp)}</Text>
+            )}
+            <Text style={styles.priceText}>{formatPrice(details.price)}</Text>
+            {details.savings > 0 && (
+              <Text style={styles.saveBadgeText}>
+                Save {formatPrice(details.savings)}
+              </Text>
+            )}
+          </View>
+        </View>
+
+        <View style={styles.dividerLine} />
+
+        {/* Select Package Selector Cards */}
+        <View style={styles.sectionContainer}>
+          <Text style={styles.sectionLabel}>Select Package:</Text>
+          <View style={styles.packsGrid}>
+            {PACK_ORDER.map((packKey) => {
+              const cfg = PACK_CONFIG[packKey];
+              const isSelected = selectedPack === packKey;
+              return (
+                <TouchableOpacity
+                  key={packKey}
+                  style={[styles.packCard, isSelected && styles.packCardSelected]}
+                  onPress={() => setSelectedPack(packKey)}
+                  activeOpacity={0.8}
+                >
+                  <View style={styles.packHeaderRow}>
+                    <Text style={styles.packEmoji}>{cfg.emoji}</Text>
+                    <Text style={[styles.packLabelText, isSelected && styles.packLabelSelected]}>
+                      {cfg.label}
+                    </Text>
+                  </View>
+                  <Text style={styles.packSubText}>
+                    {cfg.isKit
+                      ? `${cfg.soapsPerBox} products per kit`
+                      : `${cfg.soapsPerBox} soap${cfg.soapsPerBox > 1 ? "s" : ""} per box`}
+                  </Text>
+                  <Text style={[styles.packPriceText, isSelected && styles.packPriceSelected]}>
+                    {formatPrice(cfg.pricePerBox)}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </View>
+
+        {/* Product Details Card */}
+        <View style={styles.detailsListCard}>
+          <Text style={styles.detailsCardTitle}>What's Included in {currentConfig.label}:</Text>
+          <View style={styles.featureItem}>
+            <Ionicons name="checkmark-circle" size={18} color="#2D7D46" />
+            <Text style={styles.featureItemText}>
+              {currentConfig.isKit
+                ? `${currentConfig.soapsPerBox} Premium Diya Soaps Skincare Products`
+                : `${details.soaps} Handcrafted Premium Soap${details.soaps > 1 ? "s" : ""}`}
+            </Text>
+          </View>
+          <View style={styles.featureItem}>
+            <Ionicons name="checkmark-circle" size={18} color="#2D7D46" />
+            <Text style={styles.featureItemText}>100% Plant-Based Oils & Gentle Formula</Text>
+          </View>
+          <View style={styles.featureItem}>
+            <Ionicons name="checkmark-circle" size={18} color="#2D7D46" />
+            <Text style={styles.featureItemText}>Skin-Friendly — Perfect for Everyday Use</Text>
+          </View>
+          <View style={styles.featureItem}>
+            <Ionicons name="checkmark-circle" size={18} color="#2D7D46" />
+            <Text style={styles.featureItemText}>Free Delivery Across India</Text>
+          </View>
+        </View>
+      </ScrollView>
+
+      {/* Floating Bottom Footer Action Bar */}
+      <View style={styles.bottomFooterBar}>
+        <View style={styles.qtySelectorPill}>
+          <TouchableOpacity style={styles.qtyBtn} onPress={() => updateQty(-1)}>
+            <Text style={styles.qtyBtnSymbol}>-</Text>
+          </TouchableOpacity>
+
+          <Text style={styles.qtyValueText}>{currentQty}</Text>
+
+          <TouchableOpacity style={styles.qtyBtn} onPress={() => updateQty(1)}>
+            <Text style={styles.qtyBtnSymbol}>+</Text>
+          </TouchableOpacity>
+        </View>
+
+        <TouchableOpacity style={styles.addToCartPillBtn} activeOpacity={0.85} onPress={handleBuy}>
+          <Text style={styles.addToCartBtnText}>Buy Now • {formatPrice(details.price)}</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fffbeb" },
-  header: { paddingTop: 50, paddingBottom: 20, paddingHorizontal: 20, alignItems: "center" },
-  headerTitle: { color: "#f5c518", fontSize: 24, fontWeight: "900" },
-  headerSub: { color: "#aaa", fontSize: 13, marginTop: 4 },
-  content: { padding: 16 },
-  sectionLabel: { fontSize: 18, fontWeight: "800", color: "#92400e", marginBottom: 14, marginTop: 4 },
-
-  card: {
-    backgroundColor: "#fff",
-    borderRadius: 18,
-    padding: 18,
-    marginBottom: 14,
-    borderWidth: 1,
-    borderColor: "#fde68a",
-    shadowColor: "#000",
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
+  screenWrapper: {
+    flex: 1,
+    backgroundColor: "#FAF4EE",
   },
-  cardHighlight: {
-    borderRadius: 18,
-    padding: 18,
-    marginBottom: 14,
-    shadowColor: "#d97706",
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 6,
-  },
-  cardHeader: { flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 14 },
-  cardEmoji: { fontSize: 32 },
-  cardTitle: { fontSize: 17, fontWeight: "800", color: "#1a1a1a" },
-  cardTitleWhite: { color: "#fff" },
-  cardSub: { fontSize: 12, color: "#6b7280", marginTop: 2 },
-  cardSubWhite: { color: "rgba(255,255,255,0.85)" },
-  cardFeatures: { marginBottom: 14 },
-  featureRow: { flexDirection: "row", alignItems: "center", marginBottom: 6 },
-  featureText: { marginLeft: 8, fontSize: 13, color: "#374151", fontWeight: "500" },
-  featureTextWhite: { color: "#fff" },
-
-  qtyRow: {
+  headerBar: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 14,
-    paddingVertical: 8,
-    borderTopWidth: 1,
-    borderTopColor: "rgba(0,0,0,0.06)",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingTop: 50,
+    paddingBottom: 12,
+    backgroundColor: "#FAF4EE",
+    borderBottomWidth: 1,
+    borderBottomColor: "#EAE2D8",
   },
-  qtyLabel: { fontSize: 13, fontWeight: "700", color: "#374151" },
-  qtyLabelWhite: { color: "#fff" },
-  qtyControls: { flexDirection: "row", alignItems: "center", gap: 12 },
-  qtyBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: "#fef3c7",
+  backBtn: {
+    padding: 6,
+  },
+  headerTitle: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#1F1B18",
+    marginHorizontal: 8,
+  },
+  headerActions: {
+    flexDirection: "row",
+    gap: 12,
+  },
+  iconBtn: {
+    padding: 4,
+  },
+  container: {
+    flex: 1,
+    marginBottom: 74,
+  },
+  imageGalleryBox: {
+    width: "100%",
+    height: 270,
+    backgroundColor: "#FAF4EE",
+    overflow: "hidden",
+    borderBottomWidth: 1,
+    borderBottomColor: "#EAE2D8",
+  },
+  mainProductImage: {
+    width: "100%",
+    height: 240,
+  },
+  dotsRow: {
+    flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
+    gap: 8,
+    paddingVertical: 8,
   },
-  qtyBtnWhite: { backgroundColor: "#fff" },
-  qtyVal: { fontSize: 16, fontWeight: "800", color: "#1a1a1a", minWidth: 24, textAlign: "center" },
-  qtyValWhite: { color: "#fff" },
-
-  cardFooter: {
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: "#D9D0C7",
+  },
+  dotActive: {
+    backgroundColor: "#1F1B18",
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  productDetailsBox: {
+    padding: 18,
+    backgroundColor: "#FAF4EE",
+  },
+  titleShareRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
-    borderTopWidth: 1,
-    borderTopColor: "rgba(0,0,0,0.06)",
-    paddingTop: 12,
-  },
-  price: { fontSize: 24, fontWeight: "900", color: "#d97706" },
-  priceWhite: { color: "#fff" },
-  strikePrice: { fontSize: 13, color: "#9ca3af", textDecorationLine: "line-through" },
-  strikePriceWhite: { color: "rgba(255,255,255,0.6)" },
-  savings: { fontSize: 12, color: "#16a34a", fontWeight: "700", marginTop: 2 },
-  savingsWhite: { color: "rgba(255,255,255,0.9)" },
-  soapNote: { fontSize: 11, color: "#6b7280", marginTop: 2 },
-  soapNoteWhite: { color: "rgba(255,255,255,0.75)" },
-  buyBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    backgroundColor: "#d97706",
-    paddingHorizontal: 18,
-    paddingVertical: 10,
-    borderRadius: 20,
-  },
-  buyBtnText: { color: "#fff", fontWeight: "700", fontSize: 14 },
-  buyBtnWhite: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    backgroundColor: "#fff",
-    paddingHorizontal: 18,
-    paddingVertical: 10,
-    borderRadius: 20,
-  },
-  buyBtnWhiteText: { color: "#d97706", fontWeight: "700", fontSize: 14 },
-  bestOfferBadge: {
-    backgroundColor: "#fff",
-    alignSelf: "flex-start",
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 20,
+    alignItems: "flex-start",
+    gap: 12,
     marginBottom: 10,
   },
-  bestOfferText: { fontSize: 11, fontWeight: "800", color: "#d97706" },
-
-  trustCard: {
-    backgroundColor: "#f0fdf4",
-    borderRadius: 16,
-    padding: 20,
+  offerTagBadge: {
+    backgroundColor: "#F7ECE5",
     borderWidth: 1,
-    borderColor: "#bbf7d0",
-    alignItems: "center",
-    marginBottom: 20,
+    borderColor: "#E86C38",
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 12,
+    alignSelf: "flex-start",
+    marginBottom: 6,
   },
-  trustTitle: { fontSize: 16, fontWeight: "800", color: "#16a34a", marginVertical: 8 },
-  trustText: { fontSize: 13, color: "#374151", textAlign: "center", lineHeight: 20 },
+  offerTagText: {
+    fontSize: 10,
+    fontWeight: "800",
+    color: "#E86C38",
+  },
+  productTitleText: {
+    fontSize: 20,
+    fontWeight: "800",
+    color: "#1F1B18",
+    lineHeight: 26,
+  },
+  productDescText: {
+    fontSize: 13,
+    color: "#8C7D73",
+    marginTop: 2,
+  },
+  shareBtn: {
+    padding: 4,
+  },
+  priceRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    marginTop: 6,
+  },
+  mrpText: {
+    fontSize: 14,
+    color: "#9E978F",
+    textDecorationLine: "line-through",
+  },
+  priceText: {
+    fontSize: 22,
+    fontWeight: "800",
+    color: "#1F1B18",
+  },
+  saveBadgeText: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#2D7D46",
+  },
+  dividerLine: {
+    height: 1,
+    backgroundColor: "#EAE2D8",
+  },
+  sectionContainer: {
+    padding: 16,
+  },
+  sectionLabel: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#1F1B18",
+    marginBottom: 12,
+  },
+  packsGrid: {
+    gap: 10,
+  },
+  packCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 10,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: "#EAE2D8",
+  },
+  packCardSelected: {
+    borderColor: "#1F1B18",
+    borderWidth: 2,
+    backgroundColor: "#F7ECE5",
+  },
+  packHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 2,
+  },
+  packEmoji: {
+    fontSize: 18,
+  },
+  packLabelText: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#1F1B18",
+  },
+  packLabelSelected: {
+    color: "#1F1B18",
+  },
+  packSubText: {
+    fontSize: 12,
+    color: "#8C7D73",
+    marginLeft: 26,
+    marginBottom: 4,
+  },
+  packPriceText: {
+    fontSize: 16,
+    fontWeight: "800",
+    color: "#1F1B18",
+    marginLeft: 26,
+  },
+  packPriceSelected: {
+    color: "#1F1B18",
+  },
+  detailsListCard: {
+    margin: 16,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: "#EAE2D8",
+  },
+  detailsCardTitle: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#1F1B18",
+    marginBottom: 12,
+  },
+  featureItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    marginBottom: 10,
+  },
+  featureItemText: {
+    fontSize: 13,
+    color: "#4A4543",
+    fontWeight: "500",
+  },
+  bottomFooterBar: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "#FAF4EE",
+    borderTopWidth: 1,
+    borderTopColor: "#EAE2D8",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 14,
+  },
+  qtySelectorPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#EAE2D8",
+    borderRadius: 25,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    width: 100,
+  },
+  qtyBtn: {
+    paddingHorizontal: 4,
+  },
+  qtyBtnSymbol: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#1F1B18",
+  },
+  qtyValueText: {
+    fontSize: 15,
+    fontWeight: "800",
+    color: "#1F1B18",
+  },
+  addToCartPillBtn: {
+    flex: 1,
+    backgroundColor: "#231F20",
+    borderRadius: 25,
+    paddingVertical: 14,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  addToCartBtnText: {
+    color: "#FFFFFF",
+    fontSize: 15,
+    fontWeight: "700",
+    letterSpacing: 0.3,
+  },
 });

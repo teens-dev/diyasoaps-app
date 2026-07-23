@@ -5,17 +5,30 @@
 
 import { Platform } from 'react-native';
 
-const tintColorLight = '#0a7ea4';
+const tintColorLight = '#1F1B18';
 const tintColorDark = '#fff';
 
 export const Colors = {
   light: {
-    text: '#11181C',
-    background: '#fff',
+    text: '#1F1B18',
+    background: '#FAF4EE',
     tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
+    icon: '#4A4543',
+    tabIconDefault: '#9E978F',
+    tabIconSelected: '#1F1B18',
+    // Custom Diya Soaps brand design tokens
+    headerBg: '#FAF4EE',
+    cardBg: '#FFFFFF',
+    searchBg: '#F7ECE5',
+    searchPlaceholder: '#9E978F',
+    announcementBg: '#1F1B18',
+    announcementText: '#FFFFFF',
+    accentOrange: '#E86C38',
+    discountGreen: '#2D7D46',
+    badgeRed: '#E63946',
+    badgeRedBg: '#FFF0F0',
+    borderWarm: '#EAE2D8',
+    pillDark: '#231F20',
   },
   dark: {
     text: '#ECEDEE',
@@ -24,6 +37,18 @@ export const Colors = {
     icon: '#9BA1A6',
     tabIconDefault: '#9BA1A6',
     tabIconSelected: tintColorDark,
+    headerBg: '#151718',
+    cardBg: '#1E2022',
+    searchBg: '#282A2C',
+    searchPlaceholder: '#888888',
+    announcementBg: '#000000',
+    announcementText: '#FFFFFF',
+    accentOrange: '#E86C38',
+    discountGreen: '#4ADE80',
+    badgeRed: '#EF4444',
+    badgeRedBg: '#3F1D1D',
+    borderWarm: '#333333',
+    pillDark: '#FAF4EE',
   },
 };
 

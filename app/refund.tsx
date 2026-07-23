@@ -15,7 +15,7 @@ export default function Refund() {
 }
 
 const styles = StyleSheet.create({
-  c: { flex: 1, backgroundColor: "#fff", padding: 20 },
-  t: { fontSize: 22, fontWeight: "800", color: "#92400e", marginTop: 8, marginBottom: 12 },
-  b: { fontSize: 14, color: "#374151", lineHeight: 22 },
+  c: { flex: 1, backgroundColor: "#FAF4EE", padding: 20 },
+  t: { fontSize: 22, fontWeight: "800", color: "#1F1B18", marginTop: 8, marginBottom: 12 },
+  b: { fontSize: 14, color: "#4A4543", lineHeight: 22 },
 });

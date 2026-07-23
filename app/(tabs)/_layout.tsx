@@ -1,24 +1,32 @@
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
+import { Platform } from "react-native";
 
 export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: "#d97706",
-        tabBarInactiveTintColor: "#9ca3af",
+        tabBarActiveTintColor: "#1F1B18",
+        tabBarInactiveTintColor: "#8C7D73",
         tabBarStyle: {
-          backgroundColor: "#fff",
-          borderTopColor: "#fde68a",
-          borderTopWidth: 2,
-          height: 60,
-          paddingBottom: 8,
+          backgroundColor: "#FAF4EE",
+          borderTopColor: "#EAE2D8",
+          borderTopWidth: 1,
+          height: Platform.OS === "ios" ? 84 : 64,
+          paddingBottom: Platform.OS === "ios" ? 24 : 10,
+          paddingTop: 8,
+          elevation: 8,
+          shadowColor: "#000",
+          shadowOpacity: 0.05,
+          shadowRadius: 10,
         },
         tabBarLabelStyle: {
           fontSize: 11,
           fontWeight: "600",
+          letterSpacing: 0.2,
+          marginTop: 2,
         },
       }}
     >
@@ -26,8 +34,8 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "Home",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home" size={size} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons name={focused ? "home" : "home-outline"} size={22} color={color} />
           ),
         }}
       />
@@ -35,8 +43,8 @@ export default function TabLayout() {
         name="shop"
         options={{
           title: "Shop",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="bag" size={size} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons name={focused ? "bag" : "bag-outline"} size={22} color={color} />
           ),
         }}
       />
@@ -44,8 +52,8 @@ export default function TabLayout() {
         name="contact"
         options={{
           title: "Contact",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="call" size={size} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons name={focused ? "call" : "call-outline"} size={22} color={color} />
           ),
         }}
       />

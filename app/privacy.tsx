@@ -88,20 +88,20 @@ export default function Privacy() {
 }
 
 const styles = StyleSheet.create({
-  c: { flex: 1, backgroundColor: "#fff" },
+  c: { flex: 1, backgroundColor: "#FAF4EE" },
   content: { padding: 20, paddingBottom: 40 },
-  t: { fontSize: 22, fontWeight: "800", color: "#92400e", marginTop: 8, marginBottom: 4 },
-  updated: { fontSize: 12, color: "#9ca3af", marginBottom: 12 },
+  t: { fontSize: 22, fontWeight: "800", color: "#1F1B18", marginTop: 8, marginBottom: 4 },
+  updated: { fontSize: 12, color: "#8C7D73", marginBottom: 12 },
   linkBtn: {
     marginBottom: 16,
     paddingVertical: 10,
     paddingHorizontal: 12,
-    backgroundColor: "#fffbeb",
+    backgroundColor: "#FFFFFF",
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#fde68a",
+    borderColor: "#EAE2D8",
   },
-  linkText: { fontSize: 13, fontWeight: "700", color: "#d97706" },
-  h: { fontSize: 16, fontWeight: "800", color: "#92400e", marginTop: 16, marginBottom: 6 },
-  b: { fontSize: 14, color: "#374151", lineHeight: 22 },
+  linkText: { fontSize: 13, fontWeight: "700", color: "#1F1B18" },
+  h: { fontSize: 16, fontWeight: "800", color: "#1F1B18", marginTop: 16, marginBottom: 6 },
+  b: { fontSize: 14, color: "#4A4543", lineHeight: 22 },
 });
